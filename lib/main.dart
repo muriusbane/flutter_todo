@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Todo List App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.grey,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Todo List App'),
@@ -40,17 +40,17 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: _futureBuilder(),
+      body: _fBuilder(),
       floatingActionButton: _floatingActionButton(),
     );
   }
 
-  Widget _futureBuilder() {
+  Widget _fBuilder() {
     return FutureBuilder(
       future: todoService.getAll(),
       builder: (BuildContext context, AsyncSnapshot<List<TodoModel>> snapshot) {
         if (snapshot.hasData) {
-          return _todoBuilder(todos: snapshot.data);
+          return _tBuilder(todos: snapshot.data);
         }
 
         return Center(child: CircularProgressIndicator());
@@ -62,24 +62,24 @@ class _MyHomePageState extends State<MyHomePage> {
     return FloatingActionButton(
       onPressed: () => {
         todoController.clear(),
-        _showAddTodoDialog(),
+        _showAddDialog(),
       },
       tooltip: 'Add Todo',
       child: Icon(Icons.add),
     );
   }
 
-  Widget _todoBuilder({List<TodoModel> todos}) {
+  Widget _tBuilder({List<TodoModel> todos}) {
     return ListView.builder(
       padding: EdgeInsets.all(10),
       itemCount: todos.length,
       itemBuilder: (BuildContext context, int index) {
-        return _todoContent(todos, index);
+        return _tContent(todos, index);
       },
     );
   }
 
-  Widget _todoContent(List<TodoModel> todos, int index) {
+  Widget _tContent(List<TodoModel> todos, int index) {
     return Container(
       height: 50,
       child: Row(
@@ -96,26 +96,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _actionButtons(List<TodoModel> todos, int index) {
     return <Widget>[
-      _buttonBuilder(
+      _bBuilder(
           icon: Icons.edit,
-          color: Colors.deepPurple,
-          onTap: () =>
-              {todoController.clear(), _showEditTodoDialog(todos[index])}),
-      _buttonBuilder(
+          color: Colors.blue,
+          onTap: () => {todoController.clear(), _showEditDialog(todos[index])}),
+      _bBuilder(
         icon: Icons.delete,
-        color: Colors.deepOrange,
+        color: Colors.red,
         onTap: () => {
           setState(() {
             todoService
                 .delete(todos[index])
-                .then((String message) => _toastBuilder(message));
+                .then((String message) => _toast(message));
           }),
         },
       )
     ];
   }
 
-  Widget _buttonBuilder({IconData icon, Color color, void Function() onTap}) {
+  Widget _bBuilder({IconData icon, Color color, void Function() onTap}) {
     return GestureDetector(
       child: Icon(
         icon,
@@ -125,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _showAddTodoDialog() async {
+  Future<void> _showAddDialog() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -135,13 +134,13 @@ class _MyHomePageState extends State<MyHomePage> {
           content: _dialogContent(),
           actions: <Widget>[
             _cancelButton(),
-            _submitButtonBuilder(() => {
+            _submitButton(() => {
                   setState(() {
                     todoService
                         .post(TodoModel(
                           body: todoController.text,
                         ))
-                        .then((String message) => _toastBuilder(message));
+                        .then((String message) => _toast(message));
                   }),
                   Navigator.of(context).pop(),
                 }),
@@ -151,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _showEditTodoDialog(TodoModel todo) async {
+  Future<void> _showEditDialog(TodoModel todo) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -161,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
           content: _dialogContent(),
           actions: <Widget>[
             _cancelButton(),
-            _submitButtonBuilder(
+            _submitButton(
               () => {
                 setState(() {
                   todoService
@@ -169,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         id: todo.id,
                         body: todoController.text,
                       ))
-                      .then((String message) => _toastBuilder(message));
+                      .then((String message) => _toast(message));
                 }),
                 Navigator.of(context).pop(),
               },
@@ -192,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _submitButtonBuilder(void Function() onPressed) {
+  Widget _submitButton(void Function() onPressed) {
     return FlatButton(
       child: Text('Send'),
       onPressed: onPressed,
@@ -208,13 +207,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<bool> _toastBuilder(String message) {
+  Future<bool> _toast(String message) {
     return Fluttertoast.showToast(
       msg: message,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Colors.deepPurple,
+      backgroundColor: Colors.grey,
       textColor: Colors.white,
       fontSize: 14.0,
     );
