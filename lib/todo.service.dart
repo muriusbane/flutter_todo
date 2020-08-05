@@ -24,9 +24,9 @@ class TodoService {
         await http.post(url, headers: headers, body: convert.jsonEncode(todo));
 
     if (res.statusCode == 200) {
-      return "${todo.body} is added.";
+      return "${todo.description} is added.";
     } else {
-      return "Unable to add ${todo.body}!";
+      return "Unable to add ${todo.description}!";
     }
   }
 
@@ -35,9 +35,9 @@ class TodoService {
         headers: headers, body: convert.jsonEncode(todo));
 
     if (res.statusCode == 200) {
-      return "${todo.body} is updated.";
+      return "${todo.description} is updated.";
     } else {
-      return "Unable to update ${todo.body}!";
+      return "Unable to update ${todo.description}!";
     }
   }
 
@@ -45,9 +45,9 @@ class TodoService {
     http.Response res = await http.delete('$url/${todo.id}', headers: headers);
 
     if (res.statusCode == 200) {
-      return "${todo.body} is removed.";
+      return "${todo.description} is removed.";
     } else {
-      return "${todo.body} wasn't removed!";
+      return "${todo.description} wasn't removed!";
     }
   }
 }

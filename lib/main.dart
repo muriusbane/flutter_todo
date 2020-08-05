@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
       future: todoService.getAll(),
       builder: (BuildContext context, AsyncSnapshot<List<TodoModel>> snapshot) {
         if (snapshot.hasData) {
-          return _tBuilder(todos: snapshot.data);
+          return _tBuilder(snapshot.data);
         }
 
         return Center(child: CircularProgressIndicator());
@@ -69,45 +69,43 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _tBuilder({List<TodoModel> todos}) {
+  Widget _tBuilder(List<TodoModel> todos) {
     return ListView.builder(
       padding: EdgeInsets.all(10),
       itemCount: todos.length,
       itemBuilder: (BuildContext context, int index) {
-        return _tContent(todos, index);
+        return _tContent(todos[index]);
       },
     );
   }
 
-  Widget _tContent(List<TodoModel> todos, int index) {
+  Widget _tContent(TodoModel todo) {
     return Container(
       height: 50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(todos[index].body),
+          Text(todo.description),
           Row(
-            children: _actionButtons(todos, index),
+            children: _actionButtons(todo),
           ),
         ],
       ),
     );
   }
 
-  _actionButtons(List<TodoModel> todos, int index) {
+  List<Widget> _actionButtons(TodoModel todo) {
     return <Widget>[
       _bBuilder(
           icon: Icons.edit,
           color: Colors.blue,
-          onTap: () => {todoController.clear(), _showEditDialog(todos[index])}),
+          onTap: () => {todoController.clear(), _showEditDialog(todo)}),
       _bBuilder(
         icon: Icons.delete,
         color: Colors.red,
         onTap: () => {
           setState(() {
-            todoService
-                .delete(todos[index])
-                .then((String message) => _toast(message));
+            todoService.delete(todo).then((String message) => _toast(message));
           }),
         },
       )
@@ -138,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() {
                     todoService
                         .post(TodoModel(
-                          body: todoController.text,
+                          description: todoController.text,
                         ))
                         .then((String message) => _toast(message));
                   }),
@@ -156,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit ${todo.body}?'),
+          title: Text('Edit ${todo.description}?'),
           content: _dialogContent(),
           actions: <Widget>[
             _cancelButton(),
@@ -166,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   todoService
                       .patch(TodoModel(
                         id: todo.id,
-                        body: todoController.text,
+                        description: todoController.text,
                       ))
                       .then((String message) => _toast(message));
                 }),
